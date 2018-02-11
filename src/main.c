@@ -9,6 +9,7 @@
 
 #include "client.h"
 #include "common.h"
+#include "poll_server.h"
 
 #define SOCKOPTS "cshp:a:i:r:"
 
@@ -44,6 +45,7 @@ int main (int argc, char *argv[]) {
         static struct option long_options[] = {
             {"client",      no_argument,       0, 'c' },
             {"server",      no_argument,       0, 's' },
+            {"poll",        no_argument,       0, 'l' },
             {"help",        no_argument,       0, 'h' },
             {"initial",        required_argument, 0, 'i' },
             {"rate",        required_argument, 0, 'r' },
@@ -72,6 +74,13 @@ int main (int argc, char *argv[]) {
                 }
                 server_mode = 1;
                 break;
+            case 'l':
+                if (client_mode) {
+                    printf("Client and server requested, exiting\n");
+                    return 1;
+                }
+                server_mode = 2;
+                break;
             case 'i':
                 initial = atoi(optarg);
                 break;
@@ -93,7 +102,7 @@ int main (int argc, char *argv[]) {
     }
 
     if (server_mode) {
-//        return server(port);
+        poll_server();
     } else if (client_mode) {
         client(address, port, initial, rate);
     } else {
